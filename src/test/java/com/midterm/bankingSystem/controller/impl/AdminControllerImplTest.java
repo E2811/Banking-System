@@ -3,6 +3,7 @@ package com.midterm.bankingSystem.controller.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.midterm.bankingSystem.controller.dto.RequestDto;
 import com.midterm.bankingSystem.enums.AccountType;
+import com.midterm.bankingSystem.enums.Status;
 import com.midterm.bankingSystem.model.*;
 import com.midterm.bankingSystem.repository.*;
 import org.junit.jupiter.api.AfterEach;
@@ -86,7 +87,6 @@ class AdminControllerImplTest {
         savingRepository.save(saving);
         Admin admin = new Admin();
         admin.setUsername("admin");
-        //PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         admin.setPassword(passwordEncoder.encode("admin"));
         userRepository.save(admin);
         Role role1= new Role("ROLE_ADMIN",admin);
@@ -158,5 +158,24 @@ class AdminControllerImplTest {
     void changeBalance_thrirdPartyUser_Saving_notEnoughBalance() throws Exception {
         RequestDto requestDto = new RequestDto(new BigDecimal("900"), saving.getId(), AccountType.SAVING,"debit","857");
         mockMvc.perform(patch("/account/transaction").with(httpBasic("admin", "admin")).content(objectMapper.writeValueAsString(requestDto)).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void changeStatusActive() throws Exception {
+        saving.setStatus(Status.FROZEN);
+        savingRepository.save(saving);
+        mockMvc.perform(patch("/account/status/"+saving.getId()).with(user("admin").roles("ADMIN"))).andExpect(status().isNoContent());
+        assertEquals(Status.ACTIVE,savingRepository.findAll().get(0).getStatus());
+    }
+    @Test
+    void changeStatusActive_alreadyActive_badRequest() throws Exception {
+        mockMvc.perform(patch("/account/status/"+saving.getId()).with(user("admin").roles("ADMIN"))).andExpect(status().isBadRequest());
+    }
+    @Test
+    void changeStatusActive_checkingAccount() throws Exception {
+        checkingAccount.setStatus(Status.FROZEN);
+        checkingRepository.save(checkingAccount);
+        mockMvc.perform(patch("/account/status/"+checkingAccount.getId()).with(user("admin").roles("ADMIN"))).andExpect(status().isNoContent());
+        assertEquals(Status.ACTIVE,checkingRepository.findAll().get(0).getStatus());
     }
 }

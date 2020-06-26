@@ -22,9 +22,8 @@ public class Saving extends Account {
     private Status status;
     private BigDecimal minimumBalance;
     private BigDecimal interestRate;
-    private LocalDateTime updateDate;
     private boolean penalty;
-    //private final Logger LOGGER = LogManager.getLogger(Saving.class);
+    private static final Logger LOGGER = LogManager.getLogger(Saving.class);
 
     public Saving() {
         this.status =  Status.ACTIVE;
@@ -65,7 +64,7 @@ public class Saving extends Account {
     }
 
     public void check(){
-        //LOGGER.info("[INIT] -check minimum balance on a saving account");
+        LOGGER.info("[INIT] -check minimum balance on a saving account");
         if (balance.getAmount().compareTo(minimumBalance)==-1 && penalty== false){
             balance.decreaseAmount(new Money(penaltyFee));
             penalty = true;
@@ -73,10 +72,10 @@ public class Saving extends Account {
         if (balance.getAmount().compareTo(minimumBalance)==1 && penalty== true){
             penalty = false;
         }
-        //LOGGER.info("[INIT] -check interest rate on a saving account");
+        LOGGER.info("[INIT] -check interest rate on a saving account");
         int years = (int) updateDate.until(LocalDateTime.now(), ChronoUnit.YEARS);
-        if (years >= 1){
-            //LOGGER.info("interest added on a saving account");
+        if (years >= 1 && balance.getAmount().compareTo(new BigDecimal("0"))==1){
+            LOGGER.info("interest added on a saving account");
             balance.increaseAmount(balance.getAmount().multiply(interestRate.add(new BigDecimal("1").pow(years))));
             updateDate = updateDate.plusYears(years);
         }

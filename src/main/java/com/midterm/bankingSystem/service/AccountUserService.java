@@ -3,6 +3,7 @@ import com.midterm.bankingSystem.controller.dto.AccountMV;
 import com.midterm.bankingSystem.controller.dto.TransferDto;
 import com.midterm.bankingSystem.enums.AccountType;
 import com.midterm.bankingSystem.enums.Status;
+import com.midterm.bankingSystem.exception.DataNotFoundException;
 import com.midterm.bankingSystem.exception.FraudDetection;
 import com.midterm.bankingSystem.exception.InvalidAccountUser;
 import com.midterm.bankingSystem.exception.LowBalance;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class AccountUserService {
@@ -42,8 +44,12 @@ public class AccountUserService {
     private CreditCardRepository creditCardRepository;
     @Autowired
     private StudentCheckingRepository studentCheckingRepository;
+    @Autowired
+    private AccountRepository accountRepository;
+    @Autowired
+    private AccountHolderRepository accountHolderRepository;
 
-    private final Logger LOGGER = LogManager.getLogger(AccountUserService.class);
+    private static final Logger LOGGER = LogManager.getLogger(AccountUserService.class);
 
     @Secured({"ROLE_ACCOUNTUSER"})
     @Transactional(noRollbackFor = FraudDetection.class)
@@ -172,9 +178,9 @@ public class AccountUserService {
                 transaction.setReceiptAccount(receiptAccount1);
                 break;
         }
-        LOGGER.info("Transaction save " + LocalDateTime.now());
         transaction.setAmount(transferDto.getAmount());
         transactionRepository.save(transaction);
+        LOGGER.info("Transaction by: "+transaction.getSenderAccount()+" saved " + LocalDateTime.now());
         LOGGER.info("[Finished] -transfer money between accounts");
     }
 
@@ -183,11 +189,13 @@ public class AccountUserService {
         BigDecimal highestTransaction = transactionRepository.highestTransaction(LocalDateTime.now(), transferDto.getId());
         LocalDateTime lastTransaction = transactionRepository.lastTransaction(transferDto.getId());
         BigDecimal senderTransaction = transactionRepository.highestTransactionOwner(LocalDateTime.now(), transferDto.getId());
-
+        if (senderTransaction == null) {
+            senderTransaction = new BigDecimal("0");
+        }
         if ((lastTransaction != null) &&(Duration.between(lastTransaction, LocalDateTime.now()).getSeconds() < 1)) {
             LOGGER.error("Fraud detected: More than 2 transactions occurring within a 1 second");
             fraud = true;
-        }else if ((highestTransaction!=null) && (senderTransaction!=null) &&(highestTransaction.multiply(new BigDecimal("2.50")).compareTo(senderTransaction.add(transferDto.getAmount())) == -1)){
+        }else if ((highestTransaction!=null) &&(highestTransaction.multiply(new BigDecimal("2.50")).compareTo(senderTransaction.add(transferDto.getAmount())) == -1)){
             LOGGER.error("Transactions made in 24 hours that total to more than 150% of the customers highest daily total transactions in any other 24 hour period.");
             fraud = true;
         }
@@ -195,50 +203,51 @@ public class AccountUserService {
     }
 
     @Secured({"ROLE_ACCOUNTUSER"})
-    public AccountMV findByIdOwnAccount(Integer accountId, AccountType typeAccount, User accountUser){
-        switch (typeAccount.toString()){
-            case "checking":
-                CheckingAccount account = checkingService.findById(accountId);
-                if (!accountUser.getUsername().equals(account.getPrimaryOwner().getName()) && account.getSecondaryOwner() != null && !accountUser.getUsername().equals(account.getSecondaryOwner().getName())) {
-                    throw new InvalidAccountUser("Account not authorized to this user");
-                } else if (!accountUser.getUsername().equals(account.getPrimaryOwner().getName()) && account.getSecondaryOwner() == null) {
-                    throw new InvalidAccountUser("Account not authorized to this user");
-                }
-                AccountMV accountMV = new AccountMV(account.getBalance(), account.getPrimaryOwner());
-                accountMV.setId(account.getId());
-                return accountMV;
-            case "saving":
-                Saving account1 = savingService.findById(accountId);
-                if (!accountUser.getUsername().equals(account1.getPrimaryOwner().getName()) && account1.getSecondaryOwner() != null && !accountUser.getUsername().equals(account1.getSecondaryOwner().getName())) {
-                    throw new InvalidAccountUser("Account not authorized to this user");
-                } else if (!accountUser.getUsername().equals(account1.getPrimaryOwner().getName()) && account1.getSecondaryOwner() == null) {
-                    throw new InvalidAccountUser("Account not authorized to this user");
-                }
-                AccountMV accountMV1 = new AccountMV(account1.getBalance(), account1.getPrimaryOwner());
-                accountMV1.setId(account1.getId());
-                return accountMV1;
-            case "creditcard":
-               CreditCard account2 = creditCardService.findById(accountId);
-                if (!accountUser.getUsername().equals(account2.getPrimaryOwner().getName()) && account2.getSecondaryOwner() != null && !accountUser.getUsername().equals(account2.getSecondaryOwner().getName())) {
-                    throw new InvalidAccountUser("Account not authorized to this user");
-                } else if (!accountUser.getUsername().equals(account2.getPrimaryOwner().getName()) && account2.getSecondaryOwner() == null) {
-                    throw new InvalidAccountUser("Account not authorized to this user");
-                }
-                AccountMV accountMV2 = new AccountMV(account2.getBalance(), account2.getPrimaryOwner());
-                accountMV2.setId(account2.getId());
-                return accountMV2;
-            case "studentchecking":
-                StudentChecking account3 = studentCheckingService.findById(accountId);
-                if (!accountUser.getUsername().equals(account3.getPrimaryOwner().getName()) && account3.getSecondaryOwner() != null && !accountUser.getUsername().equals(account3.getSecondaryOwner().getName())) {
-                    throw new InvalidAccountUser("Account not authorized to this user");
-                } else if (!accountUser.getUsername().equals(account3.getPrimaryOwner().getName()) && account3.getSecondaryOwner() == null) {
-                    throw new InvalidAccountUser("Account not authorized to this user");
-                }
-                AccountMV accountMV3 = new AccountMV(account3.getBalance(), account3.getPrimaryOwner());
-                accountMV3.setId(account3.getId());
-                return accountMV3;
+    public AccountMV findByIdOwnAccount(Integer accountId, User accountUser){
+        LOGGER.info("[INIT] - findByIdOwnAccount");
+        AccountHolder accountHolder = accountHolderRepository.findByName(accountUser.getUsername());
+        Account account = accountRepository.findAccountById(accountHolder.getId() , accountId);
+        AccountMV accountMV;
+        if(account instanceof CheckingAccount){
+            ((CheckingAccount) account).check();
+            LOGGER.info("Account Checking has been found and checked");
+            accountMV = new AccountMV(account.getBalance(),account.getPrimaryOwner());
+            accountMV.setId(account.getId());
+            LOGGER.info("[END] - findByIdOwnAccount");
+            return accountMV;
         }
-        return null;
+        if(account instanceof StudentChecking){
+            LOGGER.info("Account Student found");
+            accountMV = new AccountMV(account.getBalance(),account.getPrimaryOwner());
+            accountMV.setId(account.getId());
+            LOGGER.info("[END] - findByIdOwnAccount");
+            return accountMV;
+        }
+        if(account instanceof Saving){
+            ((Saving) account).check();
+            LOGGER.info("Account Saving has been found and checked");
+            accountMV = new AccountMV(account.getBalance(),account.getPrimaryOwner());
+            accountMV.setId(account.getId());
+            LOGGER.info("[END] - findByIdOwnAccount");
+            return accountMV;
+        }
+        if(account instanceof CreditCard){
+            ((CreditCard) account).check();
+            LOGGER.info("Account CreditCard has been found and checked");
+            accountMV = new AccountMV(account.getBalance(),account.getPrimaryOwner());
+            accountMV.setId(account.getId());
+            LOGGER.info("[END] - findByIdOwnAccount");
+            return accountMV;
+        }
+        throw new DataNotFoundException("Account not found or unAuthorized for this user");
+    }
+
+    @Secured({"ROLE_ACCOUNTUSER"})
+    public List<Account> findAll(User accountUser){
+        LOGGER.info("[INIT] -find All accounts of a particular owner");
+        AccountHolder accountHolder = accountHolderRepository.findByName(accountUser.getUsername());
+        LOGGER.info("[EXIT] -find All accounts of a particular owner");
+        return accountRepository.findByPrimaryOwner(accountHolder);
     }
 
 }

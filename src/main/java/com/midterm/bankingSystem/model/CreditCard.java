@@ -17,9 +17,7 @@ public class CreditCard extends Account {
 
     private BigDecimal interestRate;
 
-    private LocalDateTime updateDate;
-
-    //private final Logger LOGGER = LogManager.getLogger(CreditCard.class);
+    private static final Logger LOGGER = LogManager.getLogger(CreditCard.class);
 
     public CreditCard() {
         this.updateDate = LocalDateTime.now();
@@ -49,10 +47,10 @@ public class CreditCard extends Account {
     }
 
     public void check(){
-        //LOGGER.info("[INIT] -check interest rate on a creditCard account");
+        LOGGER.info("[INIT] -check interest rate on a creditCard account");
         int months =  (int) updateDate.until(LocalDateTime.now(), ChronoUnit.MONTHS);
         if (months > 0){
-            //LOGGER.info("interest added on a creditCard account");
+            LOGGER.info("interest added on a creditCard account");
             balance.increaseAmount(balance.getAmount().multiply(interestRate.divide(new BigDecimal("12")).add(new BigDecimal("1")).pow(months)));
             updateDate = updateDate.plusYears(Math.floorDiv(months, 12));
             updateDate = updateDate.plusMonths(months % 12);

@@ -5,6 +5,7 @@ import com.midterm.bankingSystem.controller.dto.CreditCardDto;
 import com.midterm.bankingSystem.controller.interfaces.CreditCardController;
 import com.midterm.bankingSystem.model.CreditCard;
 import com.midterm.bankingSystem.service.CreditCardService;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
-
+@Api(tags = "CreditCard Controller")
 @RestController
 public class CreditCardControllerImpl implements CreditCardController {
 

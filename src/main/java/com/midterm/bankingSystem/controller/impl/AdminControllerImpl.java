@@ -7,6 +7,7 @@ import com.midterm.bankingSystem.model.AccountUser;
 import com.midterm.bankingSystem.model.ThirdPartyUser;
 import com.midterm.bankingSystem.model.User;
 import com.midterm.bankingSystem.service.AdminService;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-
+@Api(tags = "Admin Controller")
 @RestController
 public class AdminControllerImpl  implements AdminController {
 
@@ -38,4 +39,11 @@ public class AdminControllerImpl  implements AdminController {
     public void changeBalance(@AuthenticationPrincipal User user, @RequestBody @Valid RequestDto requestDto) {
         adminService.changeBalance(user, requestDto);
     }
+    @PatchMapping("/account/status/{accountId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void changeStatus(@PathVariable Integer accountId) {
+        adminService.changeStatus(accountId);
+    }
+
+
 }

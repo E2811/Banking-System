@@ -33,20 +33,12 @@ public class Transaction {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
     public Account getSenderAccount() {
         return senderAccount;
     }
 
     public void setSenderAccount(Account senderAccount) {
         this.senderAccount = senderAccount;
-    }
-
-    public Account getReceiptAccount() {
-        return receiptAccount;
     }
 
     public void setReceiptAccount(Account receiptAccount) {

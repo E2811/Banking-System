@@ -8,6 +8,7 @@ import org.hibernate.annotations.FetchMode;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -38,15 +39,17 @@ public abstract class Account {
     @JsonIgnore
     @Fetch(value = FetchMode.SUBSELECT)
     protected List<Transaction> receiptTransactions;
-
+    protected LocalDateTime updateDate;
 
     public Account() {
+        this.updateDate = LocalDateTime.now();
     }
 
     public Account(Money balance, AccountHolder primaryOwner, String secretKey) {
         this.balance = balance;
         this.primaryOwner = primaryOwner;
         this.secretKey = secretKey;
+        this.updateDate = LocalDateTime.now();
     }
 
     public List<Transaction> getTransactions() {

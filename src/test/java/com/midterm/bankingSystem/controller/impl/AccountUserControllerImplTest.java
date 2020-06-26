@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -25,7 +26,9 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -46,6 +49,8 @@ class AccountUserControllerImplTest {
     private RoleRepository roleRepository;
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    private StudentCheckingRepository studentCheckingRepository;
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -56,6 +61,8 @@ class AccountUserControllerImplTest {
     private CreditCard creditCard;
     private Transaction transaction;
     private Transaction transaction1;
+    private AccountUser accountUser1;
+    private StudentChecking studentChecking;
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @BeforeEach
@@ -71,8 +78,14 @@ class AccountUserControllerImplTest {
         creditCardRepository.save(creditCard);
         accountUser = new AccountUser(accountHolder.getName(), passwordEncoder.encode(accountHolder.getPassword()));
         userRepository.save(accountUser);
-        Role role = new Role("ROLE_ACCOUNTUSER", accountUser);
+        accountUser1 = new AccountUser(accountHolder1.getName(), passwordEncoder.encode(accountHolder1.getPassword()));
+        userRepository.save(accountUser1);
+        Role role = new Role("ROLE_ACCOUNTUSER", accountUser1);
         roleRepository.save(role);
+        Role role1 = new Role("ROLE_ACCOUNTUSER", accountUser);
+        roleRepository.save(role1);
+        studentChecking = new StudentChecking(new Money(new BigDecimal("320")),accountHolder1,"293");
+        studentCheckingRepository.save(studentChecking);
         transaction1 = new Transaction(checkingAccount, new BigDecimal("50"));
         transaction1.setReceiptAccount(creditCard);
         transaction1.setDateTransaction(LocalDateTime.now().minusMinutes(60));
@@ -86,6 +99,7 @@ class AccountUserControllerImplTest {
         transactionRepository.deleteAll();
         checkingRepository.deleteAll();
         creditCardRepository.deleteAll();
+        studentCheckingRepository.deleteAll();
         accountHolderRepository.deleteAll();
     }
 
@@ -129,7 +143,22 @@ class AccountUserControllerImplTest {
     }
 
     @Test
-    void findById() {
+    void findById() throws Exception {
+        MvcResult result = mockMvc.perform(get("/user/account/"+checkingAccount.getId()).with(httpBasic("Lucia", "playa"))).andExpect(status().isOk()).andReturn();
+        assertTrue(result.getResponse().getContentAsString().contains("Lucia"));
+    }
+
+    @Test
+    void findAll() throws Exception {
+        MvcResult result = mockMvc.perform(get("/accounts").with(httpBasic("Lucia", "playa"))).andExpect(status().isOk()).andReturn();
+        assertTrue(result.getResponse().getContentAsString().contains("234"));
+    }
+    @Test
+    void transfer_studentCheking() throws Exception {
+        TransferDto transferDto = new TransferDto(studentChecking.getId(), accountHolder.getName(), checkingAccount.getId(), new BigDecimal("50"), AccountType.STUDENT_CHECKING, AccountType.CHECKING);
+        mockMvc.perform(post("/account/transfer").with(httpBasic("Pablo", "montaña")).content(objectMapper.writeValueAsString(transferDto)).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
+        assertEquals(new BigDecimal("270.00"), studentCheckingRepository.findAll().get(0).getBalance().getAmount());
+        assertEquals(new BigDecimal("3550.00"), checkingRepository.findAll().get(0).getBalance().getAmount());
     }
 }
 
