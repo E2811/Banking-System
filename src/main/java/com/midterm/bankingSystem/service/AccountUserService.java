@@ -1,7 +1,6 @@
 package com.midterm.bankingSystem.service;
 import com.midterm.bankingSystem.controller.dto.AccountMV;
 import com.midterm.bankingSystem.controller.dto.TransferDto;
-import com.midterm.bankingSystem.enums.AccountType;
 import com.midterm.bankingSystem.enums.Status;
 import com.midterm.bankingSystem.exception.DataNotFoundException;
 import com.midterm.bankingSystem.exception.FraudDetection;
@@ -13,10 +12,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
+
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -214,6 +212,7 @@ public class AccountUserService {
             accountMV = new AccountMV(account.getBalance(),account.getPrimaryOwner());
             accountMV.setId(account.getId());
             LOGGER.info("[END] - findByIdOwnAccount");
+            accountRepository.save(account);
             return accountMV;
         }
         if(account instanceof StudentChecking){
@@ -225,6 +224,7 @@ public class AccountUserService {
         }
         if(account instanceof Saving){
             ((Saving) account).check();
+            accountRepository.save(account);
             LOGGER.info("Account Saving has been found and checked");
             accountMV = new AccountMV(account.getBalance(),account.getPrimaryOwner());
             accountMV.setId(account.getId());
@@ -233,6 +233,7 @@ public class AccountUserService {
         }
         if(account instanceof CreditCard){
             ((CreditCard) account).check();
+            accountRepository.save(account);
             LOGGER.info("Account CreditCard has been found and checked");
             accountMV = new AccountMV(account.getBalance(),account.getPrimaryOwner());
             accountMV.setId(account.getId());

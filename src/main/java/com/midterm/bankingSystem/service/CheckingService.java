@@ -16,6 +16,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 
 import javax.security.sasl.AuthenticationException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -29,7 +30,7 @@ public class CheckingService {
     @Autowired
     private TransactionRepository transactionRepository;
 
-    private final Logger LOGGER = LogManager.getLogger(CheckingService.class);
+    private static final Logger LOGGER = LogManager.getLogger(CheckingService.class);
 
     @Secured({"ROLE_ADMIN"})
     public List<CheckingAccount> findAll(){
@@ -81,6 +82,7 @@ public class CheckingService {
         }
         checkingRepository.save(checkingAccount);
         transactionRepository.save(new Transaction(checkingAccount, requestDto.getAmount()));
+        LOGGER.info("Transaction made by "+user.getId()+" finished at "+ LocalDateTime.now());
         LOGGER.info("[EXIT]- change balance checking Account");
     }
 }

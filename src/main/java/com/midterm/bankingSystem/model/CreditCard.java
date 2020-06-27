@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.persistence.Entity;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -51,7 +52,7 @@ public class CreditCard extends Account {
         int months =  (int) updateDate.until(LocalDateTime.now(), ChronoUnit.MONTHS);
         if (months > 0){
             LOGGER.info("interest added on a creditCard account");
-            balance.increaseAmount(balance.getAmount().multiply(interestRate.divide(new BigDecimal("12")).add(new BigDecimal("1")).pow(months)));
+            balance.increaseAmount(balance.getAmount().multiply(interestRate.divide(new BigDecimal("12"),8, RoundingMode.HALF_EVEN).add(new BigDecimal("1")).pow(months)));
             updateDate = updateDate.plusYears(Math.floorDiv(months, 12));
             updateDate = updateDate.plusMonths(months % 12);
         }

@@ -33,47 +33,24 @@ public class TransferDto {
         return typeOwnAccount;
     }
 
-    public void setTypeOwnAccount(AccountType typeOwnAccount) {
-        this.typeOwnAccount = typeOwnAccount;
-    }
-
     public AccountType getTypeReceiptAccount() {
         return typeReceiptAccount;
-    }
-
-    public void setTypeReceiptAccount(AccountType typeReceiptAccount) {
-        this.typeReceiptAccount = typeReceiptAccount;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public Integer getAccountId() {
         return accountId;
-    }
-
-    public void setAccountId(Integer accountId) {
-        this.accountId = accountId;
     }
 
     public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
     public Integer getId() {
         return Id;
     }
 
-    public void setId(Integer id) {
-        Id = id;
-    }
 }

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +34,7 @@ public class SavingService {
     private AccountHolderService accountHolderService;
 
 
-    private final Logger LOGGER = LogManager.getLogger(SavingService.class);
+    private static final Logger LOGGER = LogManager.getLogger(SavingService.class);
     @Secured({"ROLE_ADMIN"})
     public List<Saving> findAll(){
         LOGGER.info("[INIT] -findAll saving accounts");
@@ -132,6 +133,7 @@ public class SavingService {
         }
         transactionRepository.save(new Transaction(saving, requestDto.getAmount()));
         savingRepository.save(saving);
+        LOGGER.info("Transaction made by "+user.getId()+" finished at "+ LocalDateTime.now());
         LOGGER.info("[EXIT]- change balance saving Account");
     }
 

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +34,7 @@ public class CreditCardService {
     @Autowired
     private AccountHolderService accountHolderService;
 
-    private final Logger LOGGER = LogManager.getLogger(CreditCardService.class);
+    private static final Logger LOGGER = LogManager.getLogger(CreditCardService.class);
 
     @Secured({"ROLE_ADMIN"})
     public List<CreditCard> findAll(){
@@ -129,6 +130,7 @@ public class CreditCardService {
         }
         transactionRepository.save(new Transaction(creditCard, requestDto.getAmount()));
         creditCardRepository.save(creditCard);
+        LOGGER.info("Transaction made by "+user.getId()+" finished at "+ LocalDateTime.now());
         LOGGER.info("[EXIT]- change balance creditCard Account");
     }
 }

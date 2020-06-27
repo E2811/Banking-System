@@ -16,12 +16,13 @@ public class BankingSystemApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(BankingSystemApplication.class, args);
 	}
+
 	@Bean
 	public Docket swaggerConfiguration() {
 		return new Docket(DocumentationType.SWAGGER_2)
 				.select()
 				.paths(PathSelectors.any())
-				.apis(RequestHandlerSelectors.basePackage("com.ironhack"))
+				.apis(RequestHandlerSelectors.basePackage("com.midterm"))
 				.build();
 	}
 

@@ -32,10 +32,6 @@ public class RequestDto {
         this.secretKey = secretKey;
     }
 
-    public void setTypeAccount(AccountType typeAccount) {
-        this.typeAccount = typeAccount;
-    }
-
     public BigDecimal getAmount() {
         return amount;
     }
@@ -44,20 +40,8 @@ public class RequestDto {
         return action;
     }
 
-    public void setAction(String action) {
-        this.action = action;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
     public Integer getAccountId() {
         return accountId;
-    }
-
-    public void setAccountId(Integer accountId) {
-        this.accountId = accountId;
     }
 
     public AccountType getTypeAccount() {

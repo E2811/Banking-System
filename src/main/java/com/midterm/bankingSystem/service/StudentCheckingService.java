@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -24,7 +25,7 @@ public class StudentCheckingService {
     @Autowired
     private TransactionRepository transactionRepository;
 
-    private final Logger LOGGER = LogManager.getLogger(StudentCheckingService.class);
+    private static final Logger LOGGER = LogManager.getLogger(StudentCheckingService.class);
     @Secured({"ROLE_ADMIN"})
     public List<StudentChecking> findAll(){
         LOGGER.info("[INIT] -findAll student checking accounts");
@@ -72,6 +73,7 @@ public class StudentCheckingService {
         }
         transactionRepository.save(new Transaction(studentChecking, requestDto.getAmount()));
         studentCheckingRepository.save(studentChecking);
+        LOGGER.info("Transaction made by "+user.getId()+" finished at "+ LocalDateTime.now());
         LOGGER.info("[EXIT]- change balance student checking Account");
     }
 }
