@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 
 public class CheckingDto {
     @NotNull
+    @Valid
     private Money balance;
     @Valid
     private AccountHolder primaryOwner;
@@ -20,8 +21,8 @@ public class CheckingDto {
     public CheckingDto() {
     }
 
-    public CheckingDto(@NotNull String balance, AccountHolder primaryOwner, AccountHolder secondaryOwner,  @NotNull String secretKey) {
-        this.balance = new Money(new BigDecimal(balance));
+    public CheckingDto(@NotNull @Valid Money balance, AccountHolder primaryOwner, AccountHolder secondaryOwner,  @NotNull String secretKey) {
+        this.balance = balance;
         this.primaryOwner = primaryOwner;
         this.secondaryOwner = secondaryOwner;
         this.secretKey = secretKey;

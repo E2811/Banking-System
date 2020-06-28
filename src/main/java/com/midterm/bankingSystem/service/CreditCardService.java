@@ -127,6 +127,8 @@ public class CreditCardService {
                     throw new LowBalance("Balance not enough");
                 }
                 break;
+            default:
+                throw new NotEnoughData("Invalid action: debit or credit balance");
         }
         transactionRepository.save(new Transaction(creditCard, requestDto.getAmount()));
         creditCardRepository.save(creditCard);

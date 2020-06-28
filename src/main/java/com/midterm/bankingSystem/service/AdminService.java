@@ -24,7 +24,6 @@ public class AdminService {
   private UserRepository userRepo;
   @Autowired
   private RoleRepository roleRepository;
-
   @Autowired
   private CheckingService checkingService;
   @Autowired

@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 
 public class SavingDto {
     @NotNull
+    @Valid
     private Money balance;
     @Valid
     private AccountHolder primaryOwner;
@@ -30,7 +31,7 @@ public class SavingDto {
     public SavingDto() {
     }
 
-    public SavingDto(@NotNull Money balance, AccountHolder primaryOwner, AccountHolder secondaryOwner, @NotNull String secretKey, @DecimalMin("100") BigDecimal minimumBalance, @DecimalMax("0.5") BigDecimal interestRate) {
+    public SavingDto(@NotNull @Valid Money balance, AccountHolder primaryOwner, AccountHolder secondaryOwner, @NotNull String secretKey, @DecimalMin("100") BigDecimal minimumBalance, @DecimalMax("0.5") BigDecimal interestRate) {
         this.balance = balance;
         this.primaryOwner = primaryOwner;
         this.secondaryOwner = secondaryOwner;

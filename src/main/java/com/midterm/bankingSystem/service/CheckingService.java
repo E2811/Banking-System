@@ -79,6 +79,8 @@ public class CheckingService {
                     checkingAccount.getBalance().decreaseAmount(requestDto.getAmount());
                 }
                 break;
+            default:
+                throw new NotEnoughData("Invalid action: debit or credit balance");
         }
         checkingRepository.save(checkingAccount);
         transactionRepository.save(new Transaction(checkingAccount, requestDto.getAmount()));

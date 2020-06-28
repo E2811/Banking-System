@@ -2,11 +2,12 @@ package com.midterm.bankingSystem.controller.dto;
 
 import com.midterm.bankingSystem.enums.AccountType;
 
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 public class RequestDto {
-    @NotNull
+    @DecimalMin("0")
     private BigDecimal amount;
     @NotNull
     private Integer accountId;
@@ -16,7 +17,7 @@ public class RequestDto {
     private String action;
     private String secretKey;
 
-    public RequestDto(@NotNull BigDecimal amount, @NotNull Integer accountId, @NotNull AccountType typeAccount, @NotNull String action, String secretKey) {
+    public RequestDto(@DecimalMin("0") BigDecimal amount, @NotNull Integer accountId, @NotNull AccountType typeAccount, @NotNull String action, String secretKey) {
         this.amount = amount;
         this.accountId = accountId;
         this.typeAccount = typeAccount;

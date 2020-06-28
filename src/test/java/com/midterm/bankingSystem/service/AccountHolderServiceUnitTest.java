@@ -52,11 +52,13 @@ class AccountHolderServiceUnitTest {
         assertEquals(2,accountHolderService.findAll().size());
     }
     @Test
+    @WithMockUser(username = "admin",roles = "ADMIN")
     void findById(){
         AccountHolder accountHolder = accountHolderService.findById(1);
         assertEquals("pepe",accountHolder.getName());
     }
     @Test
+    @WithMockUser(username = "admin",roles = "ADMIN")
     void findById_idNotFound(){
         assertThrows(DataNotFoundException.class,()-> accountHolderService.findById(3));
     }

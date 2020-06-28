@@ -130,6 +130,8 @@ public class SavingService {
                     saving.getBalance().decreaseAmount(requestDto.getAmount());
                 }
                 break;
+            default:
+                throw new NotEnoughData("Invalid action: debit or credit balance");
         }
         transactionRepository.save(new Transaction(saving, requestDto.getAmount()));
         savingRepository.save(saving);

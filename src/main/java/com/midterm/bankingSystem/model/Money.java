@@ -3,6 +3,10 @@ package com.midterm.bankingSystem.model;
 import com.midterm.bankingSystem.interfaces.Transactional;
 
 import javax.persistence.Embeddable;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Currency;
@@ -12,6 +16,8 @@ public class Money implements Transactional {
     private static final Currency EUR = Currency.getInstance("EUR");
     private static final RoundingMode DEFAULT_ROUNDING = RoundingMode.HALF_EVEN;
     private final Currency currency;
+    @NotNull
+    @DecimalMin("0")
     private BigDecimal amount;
     /**
      * Class constructor specifying amount, currency, and rounding
@@ -28,7 +34,7 @@ public class Money implements Transactional {
         this(amount, currency, DEFAULT_ROUNDING);
     }
 
-    public Money(String amount) {
+    public Money(@DecimalMin("0") String amount) {
         this.amount = new BigDecimal(amount);
         this.currency = EUR;
     }

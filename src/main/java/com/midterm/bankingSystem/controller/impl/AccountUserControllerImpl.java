@@ -37,7 +37,7 @@ public class AccountUserControllerImpl implements AccountUserController {
         return accountUserService.findByIdOwnAccount(accountId, accountUser);
     }
 
-    @GetMapping("accounts")
+    @GetMapping("/accounts")
     @ApiOperation(value = "An accountHolder can find all its personal account")
     public List<Account> findAll(@AuthenticationPrincipal User accountUser){
         return accountUserService.findAll(accountUser);

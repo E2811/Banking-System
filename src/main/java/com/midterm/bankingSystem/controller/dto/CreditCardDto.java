@@ -13,6 +13,7 @@ import java.math.RoundingMode;
 public class CreditCardDto {
 
     @NotNull
+    @Valid
     private Money balance;
     @Valid
     private AccountHolder primaryOwner;
@@ -32,7 +33,7 @@ public class CreditCardDto {
     public CreditCardDto() {
     }
 
-    public CreditCardDto(@NotNull Money balance, AccountHolder primaryOwner, AccountHolder secondaryOwner, @NotNull String secretKey, @DecimalMax("100000") @DecimalMin("100") BigDecimal creditLimit, @DecimalMin("0.1") @DecimalMax("0.2") BigDecimal interestRate) {
+    public CreditCardDto(@NotNull @Valid Money balance, AccountHolder primaryOwner, AccountHolder secondaryOwner, @NotNull String secretKey, @DecimalMax("100000") @DecimalMin("100") BigDecimal creditLimit, @DecimalMin("0.1") @DecimalMax("0.2") BigDecimal interestRate) {
         this.balance = balance;
         this.primaryOwner = primaryOwner;
         this.secondaryOwner = secondaryOwner;

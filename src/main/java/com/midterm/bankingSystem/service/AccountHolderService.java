@@ -29,12 +29,13 @@ public class AccountHolderService {
     private RoleRepository roleRepository;
 
     private final Logger LOGGER = LogManager.getLogger(AccountHolderService.class);
+
     @Secured({"ROLE_ADMIN"})
     public List<AccountHolder> findAll(){
         LOGGER.info("[INIT] -findAll accountHolders");
         return accountHolderRepository.findAll();
     }
-
+    @Secured({"ROLE_ADMIN"})
     public AccountHolder findById(Integer id){
         LOGGER.info("[INIT] -find an accountHolder by its id");
         return accountHolderRepository.findById(id).orElseThrow(()-> new DataNotFoundException("AccountHolder with id: "+ id+ " not found"));
@@ -51,6 +52,7 @@ public class AccountHolderService {
         userRepo.save(accountUser);
         Role role = new Role("ROLE_ACCOUNTUSER",accountUser);
         roleRepository.save(role);
+        accountHolder.setPassword(passwordEncoder.encode(accountHolder.getPassword()));
         return accountHolderRepository.save(accountHolder);
     }
 
