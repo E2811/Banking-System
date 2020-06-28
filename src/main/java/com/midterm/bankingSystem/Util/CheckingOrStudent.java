@@ -19,6 +19,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -38,7 +39,7 @@ public class CheckingOrStudent {
 
     private final Logger LOGGER = LogManager.getLogger(CheckingOrStudent.class);
 
-
+    @Transactional
     public AccountMV createCheckingAccount(Optional<Integer> id, Optional<Integer> idSecondary,CheckingDto checkingDto) {
         // Check primaryOwner
         LOGGER.info("[INIT] -create a Checking or Student account");
@@ -79,7 +80,7 @@ public class CheckingOrStudent {
             accountMV.setId(studentChecking1.getId());
         } else {
             if (checkingDto.getBalance().getAmount().compareTo(new BigDecimal("250"))==-1){
-                throw new LowBalance("Balance less than the minimum allowed");
+                throw new LowBalance("Balance less than the minimum allowed (250)");
             }
             CheckingAccount checkingAccount = new CheckingAccount(checkingDto.getBalance(), accountHolder, checkingDto.getSecretKey());
             checkingAccount.setSecondaryOwner(secondaryOwner);

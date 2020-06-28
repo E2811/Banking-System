@@ -13,6 +13,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.math.BigDecimal;
@@ -49,6 +50,7 @@ public class CreditCardService {
         return creditCard;
     }
     @Secured({"ROLE_ADMIN"})
+    @Transactional
     public AccountMV create(Optional<Integer> id, Optional<Integer> idSecondary, CreditCardDto creditCardDto){
         LOGGER.info("[INIT] -Create a new credit Card account");
         CreditCard creditCard = new CreditCard();
@@ -101,7 +103,7 @@ public class CreditCardService {
         LOGGER.info("[EXIT] -Create a new credit Card account finished");
         return accountMV;
     }
-
+    @Transactional
     public void changeBalance(User user,RequestDto requestDto){
         LOGGER.info("[INIT]- change balance creditCard Account");
         CreditCard creditCard = this.findById(requestDto.getAccountId());

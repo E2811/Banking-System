@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,7 +42,7 @@ public class StudentCheckingService {
         LOGGER.info("[INIT] -create a student checking account");
         return studentCheckingRepository.save(studentChecking);
     }
-
+    @Transactional
     public void changeBalance(User user, RequestDto requestDto){
         LOGGER.info("[INIT]- change balance student checking Account");
         StudentChecking studentChecking = findById(requestDto.getAccountId());

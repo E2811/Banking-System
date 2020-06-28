@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.security.sasl.AuthenticationException;
 import java.time.LocalDateTime;
@@ -50,7 +51,7 @@ public class CheckingService {
         LOGGER.info("[INIT] -create a new Checking account");
         return checkingRepository.save(checkingAccount);
     }
-
+    @Transactional
     public void changeBalance(User user, RequestDto requestDto){
         LOGGER.info("[INIT]- change balance checking Account");
         CheckingAccount checkingAccount = findById(requestDto.getAccountId());

@@ -14,6 +14,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -48,6 +49,7 @@ public class SavingService {
         return saving;
     }
     @Secured({"ROLE_ADMIN"})
+    @Transactional
     public AccountMV create(Optional<Integer> id, Optional<Integer> idSecondary, SavingDto savingDto){
         LOGGER.info("[INIT] -create a new saving account");
         Saving saving = new Saving();
@@ -90,7 +92,7 @@ public class SavingService {
             saving.setMinimumBalance(savingDto.getMinimumBalance());
         }
         if (savingDto.getBalance().getAmount().compareTo(saving.getMinimumBalance())==-1){
-            throw new LowBalance("Balance less than the minimum allowed");
+            throw new LowBalance("Balance less than the minimum allowed "+ saving.getMinimumBalance());
         }
         saving.setBalance(savingDto.getBalance());
         saving.setSecretKey(savingDto.getSecretKey());
@@ -101,7 +103,7 @@ public class SavingService {
         LOGGER.info("[EXIT] -  create a new saving account finished");
         return accountMV;
     }
-
+    @Transactional
     public void changeBalance(User user,RequestDto requestDto){
         LOGGER.info("[INIT]- change balance saving Account");
         Saving saving = findById(requestDto.getAccountId());
