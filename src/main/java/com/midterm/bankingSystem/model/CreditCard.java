@@ -3,6 +3,7 @@ package com.midterm.bankingSystem.model;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -16,6 +17,7 @@ public class CreditCard extends Account {
 
     private BigDecimal creditLimit;
 
+    @Column(name="interest_rate", precision=12, scale=4)
     private BigDecimal interestRate;
 
     private static final Logger LOGGER = LogManager.getLogger(CreditCard.class);
